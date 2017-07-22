@@ -9,22 +9,24 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-item = {'전반':'%C0%FC%B9%DD','태양광':'%C5%C2%BE%E7%B1%A4'}
-start_date = '20170415'
-end_date = '20170714'
-page_max = 10
-sum1 = []
+items = {'전반':'%C0%FC%B9%DD','태양광':'%C5%C2%BE%E7%B1%A4'} # 한글을 이렇게 인식한다. (unicode던가)
+start_date = '20170701' # 조회 시작 날짜
+end_date = '20170714' # 조회 마지막 날짜
+page_max = 10 # 최대 page
+# 빈 list 생성
+sum1 = [] 
 sum2 = []
 sum3 = []
+item_sum = [] 
 
-# url1 뭐더라..
-for item in item.keys():
+# 1번째 url
+for item, code in items.items():
     for page in range(1,page_max+1):
         url = '''
             http://www.g2b.go.kr:8091/cm/contstus/listPpsItemContractReqStus.do?_stddocExistYn=on
-            &bchppsNo=XX&contractClCd=&g2bProdCateNo=&instName=&prodNm=%C0%FC%B9%DD&rcptDtFrom={}%2F{}%2F{}
+            &bchppsNo=XX&contractClCd=&g2bProdCateNo=&instName=&prodNm={}&rcptDtFrom={}%2F{}%2F{}
             &rcptDtTo={}%2F{}%2F{}&recordCountPerPage=30&searchType=1&currentPageNo={}&maxPageViewNoByWshan=2&
-            '''.format(start_date[:4], start_date[4:6], start_date[6:8], end_date[:4], 
+            '''.format(code, start_date[:4], start_date[4:6], start_date[6:8], end_date[:4], 
                        end_date[4:6], end_date[6:8],page)
         
         req = requests.get(url).text
@@ -35,11 +37,13 @@ for item in item.keys():
             break
         list2 = [i.text.strip() for i in soup.find_all(attrs = {'class':'tl'})]
         list3 = [i.text.strip() for i in soup.find_all(attrs = {'class':'tr'})]
+        item_nm = [item]*len(list3)
         
         sum1 += list1
         sum2 += list2
         sum3 += list3
-        item_nm = [item]*len(sum3)
+        
+        item_sum += item_nm
         
 total = sum1[::3] + sum1[1::3] + sum1[2::3] + sum2[::2] + sum2[1::2] + sum3 
 total = pd.DataFrame(data = [item_nm] + [total[i*len(sum3):(i+1)*len(sum3)] for i in range(6)], 
@@ -47,7 +51,7 @@ total = pd.DataFrame(data = [item_nm] + [total[i*len(sum3):(i+1)*len(sum3)] for 
 #%%
 sum4 = []
                      
-# url2, 3 
+# url2
 for page in range(1,page_max+1):
     url = '''
         http://www.g2b.go.kr:8101/ep/tbid/tbidList.do?area=&areaNm=&bidNm=%C0%FC%B9%DD&
