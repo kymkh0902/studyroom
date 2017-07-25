@@ -49,6 +49,7 @@ total = sum1[::3] + sum1[1::3] + sum1[2::3] + sum2[::2] + sum2[1::2] + sum3
 total = pd.DataFrame(data = [item_nm] + [total[i*len(sum3):(i+1)*len(sum3)] for i in range(6)], 
                      index = ['제품명','접수번호','품명','발주(공고)기관','예정금액','접수일자','요청구분']).T
 #%%
+# 위와 동일한 방법으로 규칙 찾아서 아래도 해보자. 
 sum4 = []
                      
 # url2
