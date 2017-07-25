@@ -10,3 +10,6 @@ from bs4 import BeautifulSoup as bs
 
 driver = wb.Chrome('C:/Users/hslee3/Desktop/개인용/과외/수업자료/studyroom')
 
+#%%
+#조달청계약요청
+
