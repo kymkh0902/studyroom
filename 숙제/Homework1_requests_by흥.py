@@ -68,7 +68,7 @@ result['가구수'] = pd.to_numeric(result['가구수'], errors='coerce')
 result = result[result['가구수'] >=500]
 
 
-result.to_excel('C:/Users/hslee3/Desktop/개인용/과외/수업자료/studyroom/숙제/2018년 입주 아파트(6월~12월,500세대).xls', index = False)
+result.to_excel('C:/Users/hslee3/Desktop/개인용/과외/수업자료/studyroom/숙제/2018년 입주 아파트(6월~12월,500세대)(2).xls', index = False)
 
 
 

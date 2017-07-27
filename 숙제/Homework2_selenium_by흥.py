@@ -12,4 +12,12 @@ driver = wb.Chrome('C:/Users/hslee3/Desktop/개인용/과외/수업자료/studyr
 
 #%%
 #조달청계약요청
+url1 = "http://www.g2b.go.kr:8091/cm/contstus/fwdPpsItemContractReqStus.do"
+
+driver.get(url1)
+
+driver.find_element_by_xpath('//*[@id="prodNm"]').send_keys('전반')
+
+
+
 
