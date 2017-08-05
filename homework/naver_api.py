@@ -7,7 +7,6 @@ Created on Tue Aug  1 17:21:15 2017
 
 import urllib.request
 import json
-import re
 
 # API id,pwd
 client_id = "oQdFeij_A5u21Iieg3vD"
@@ -15,7 +14,14 @@ client_secret = "reAn5vCotJ"
 
 # 검색 text
 
-def searchCompany(company, pattern):
+def searchCompany(company):
+    '''
+    naver 검색에서 회사 찾는 함수
+    
+    ----parameters----
+    company : 회사명
+    pattern : 찾고자 하는 패턴(주소)
+    '''
     # url 요청
     encText = urllib.parse.quote(company)
     url = "https://openapi.naver.com/v1/search/local?query={}&display=10".format(encText) # json 결과
@@ -40,8 +46,7 @@ def searchCompany(company, pattern):
     
     # 지역 확인. 
     for i in range(len(j)):
-        if re.match(pattern, j[i]['address']):
-            company_nm.append(j[i]['title'])
-            address.append(j[i]['address'])
+        company_nm.append(j[i]['title'])
+        address.append(j[i]['address'])
     return company_nm, address
         

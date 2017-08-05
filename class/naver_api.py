@@ -7,7 +7,6 @@ Created on Tue Aug  1 17:21:15 2017
 
 import urllib.request
 import json
-import re
 
 # API id,pwd
 client_id = "oQdFeij_A5u21Iieg3vD"
