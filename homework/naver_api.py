@@ -15,14 +15,7 @@ client_secret = "reAn5vCotJ"
 
 # 검색 text
 
-def searchCompany(company):
-    '''
-    naver 검색에서 회사 찾는 함수
-    
-    ----parameters----
-    company : 회사명
-    pattern : 찾고자 하는 패턴(주소)
-    '''
+def searchCompany(company, pattern):
     # url 요청
     encText = urllib.parse.quote(company)
     url = "https://openapi.naver.com/v1/search/local?query={}&display=10".format(encText) # json 결과
@@ -47,7 +40,8 @@ def searchCompany(company):
     
     # 지역 확인. 
     for i in range(len(j)):
-        company_nm.append(j[i]['title'])
-        address.append(j[i]['address'])
+        if re.match(pattern, j[i]['address']):
+            company_nm.append(j[i]['title'])
+            address.append(j[i]['address'])
     return company_nm, address
         
