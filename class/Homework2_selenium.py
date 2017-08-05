@@ -22,7 +22,7 @@ driver.get(url1)
 driver.implicitly_wait(2)
 driver.find_element_by_xpath('//*[@id="prodNm"]').send_keys('전반')
 driver.find_element_by_xpath('//*[@id="srchFrm"]/div[2]/div/a[1]/span').click()
-
+#%%
 for i in range(0,10):    
     html = driver.page_source
     soup = BeautifulSoup(html, 'lxml')
