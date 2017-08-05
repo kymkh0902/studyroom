@@ -17,7 +17,7 @@ list1_sum = []
 list2_sum = []
 list3_sum = []
 
-driver = webdriver.Chrome('C:/Users/Whi Kwon/Documents/GitHub/python_script/chromedriver.exe')
+driver = webdriver.Chrome('C:/Users/HS/Desktop/과외/studyroom/chromedriver.exe')
 driver.get(url1)
 driver.implicitly_wait(2)
 driver.find_element_by_xpath('//*[@id="prodNm"]').send_keys('전반')
