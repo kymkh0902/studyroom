@@ -58,8 +58,8 @@ for i in range(pages):
         # 가격 2억 기준 if문
         if price[j] >= 2e8:
             # 패턴 매칭
-            if re.search(pattern, company[j]):
-                company_list.append(company[j])
+            if re.searcattern, company[j]):
+                company_list.append(company[j]h(p)
             # 패턴 없을 경우, 내용 확인
             else:
                 driver.find_element_by_link_text(number[j]).click()
