@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 24 18:13:33 2017
+Created on Tue Aug  8 21:03:36 2017
 
-@author: hslee3
+@author: HS
 """
 
 from selenium import webdriver as wb
@@ -32,53 +32,74 @@ money_sum = []
 number_sum = []
 region_sum = []
 
-pages = 1
+pages = 5
 
 for i in range(pages):
     
     html = driver.page_source
     soup = bs(html, 'lxml')
     
-    date = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
-    money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
-    money = [int(i.replace('원','').replace(',','')) for i in money]
-    number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
-    region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
-    click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
-    # 'click' 버튼을 추가 : 이유는 밑에 설명
+#==============================================================================
+#     date = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
+#     money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
+#     money = [int(i.replace('원','').replace(',','')) for i in money]
+#     number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
+#     region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
+#     click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
+#==============================================================================
     
-    # 우선 적으로 날짜 길이에 한해서 'J'를 2억 이상으로 제한
-    for l in range(len(date)):
+    # date를 원하는 곳까지 필터 못하겠습니다....
+    for j in range(len(date)):
         
-        if money[j] >= 2e8:
-            # 다 클릭하는 것이 좋을 것으로 판단
-            # 1) 시간이 그리 오래 걸리지 않고, 2) 실제로도 그렇게 하며, 3) 정확도를 높이는 방법
-            driver.find_element_by_link_text(number[j]).click()
-            # 확인하는 방법은 우선적으로 패스
+            date = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
+            money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
+            money = [int(i.replace('원','').replace(',','')) for i in money]
+            number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
+            region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
+            click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
             
-            for k in range(len(date)):
-                
-                # 8일 전의 날짜가 첫 30페이지에 있었는지 확인
-                # 있다면, 위에 걸렀던 정보들 중에 날짜 내에 있는 것들만 확인
-                # 여기서 질문!!!
-                # 위에 money[j]로 인해 number[j]가 필터가 가능하잖아?
-                # 그러면 밑에 date[k]로 date를 필터하고,
-                # j와 k의 공통점만 필터하고 싶으면 어떻게 해야함?
-                # (그러면 원하는 값을 뽑는게 맞다고 생각함 아니면 말해주삼! ㄳㄳ)
-                if week_day_ago in date[k]:
-                    
-                    # 원하는 날짜가 안에 있다면 전체 for문을 break!
-                    break
-                    
-
-                # 아니면, '더보기' 클릭
-                # '더보기'의 xpath가 페이지 마다 다름을 확인
-                # //*[@id="pagination"]/a
-                # //*[@id="pagination"]/a[3]
-                # //*[@id="pagination"]/a[4]
-                # 따라서 link)_text로 'click' 텍스트 클릭하도록 함
-                else:
-                    driver.find_element_by_link_text(click).click()
+            if date[j] == '2017/07/21':
+                break
+    
+    
+    
+'''
+    우선 if문으로 지정한 날짜가 맞으면 멈춤!
+    if date[j] == week_day_ago:
+        break
+    
+    금액이 2억이 넘으면 클릭한다!
+    저번 숙제에 쓴대로 우선 2억이 넘으면 모두 클릭할 예정
+    if money[j] == 2e8:
+        driver.find_element_by_link_text(number[j]).click()
+        
+        3가지 순서대로 지역에 맞는지 확인
+        납품장소 - 공사명 - 발주(공고)기관
+        또한, 각 공고 내의 위 사항들은 모두 같은 xpath를 가짐을 확인
+        
+        if 납품장소 == "대전~~~":
+            필요한 항목들을 끌고옴
+            
+        else if 공사명 == "대전~~~~":
+            필요한 항목들을 끌고옴
+            
+        else if 발주(공고)기관 == "041", "042", "043", "044":
+            필요한 항목들을 끌고옴
+            
+        else if 발주(공고)기관을 '네이버지도'에 검색하여 상위 3개를 확인하여 "대전~~~"이 있으면:
+            필요한 항목들을 끌고옴
+            
+        else:
+            2억 이상의 리스트를 확인할 수 있도록 엑셀로 만들어서 확인
+            이건 그때 그때 마다 보고 지울 생각.
+            또한, 원하는 지역이 아니었던 발주(공고)기관들은 리스트로 만들어서
+            추후에 네이버 지도에 검색하는 것보다 우선적으로 리스트를 확인할 수 있도록 만들고 싶음
+    
+    내가 원하는 결론은
+    1) 필요한 항목들을 엑셀로 만들어서 보는 것
+    2) 내가 걸러낸 항목(2억 이하)에 대해서 맞는지 확인
+       -> 그래서 납품장소, 공사명도 가져와야 되는지 의문..
+    3) 내가 걸러낸 발주(공고)기관들은 계속 데이터로 가지고 있을 예정 '''
 
 
                     
