@@ -27,42 +27,90 @@ driver.get("http://www.g2b.go.kr:8091/cm/contstus/fwdPpsItemContractReqStus.do")
 driver.find_element_by_xpath('//*[@id="prodNm"]').send_keys('전반')
 driver.find_element_by_xpath('//*[@id="srchFrm"]/div[2]/div/a[1]/span').click()
 
+## 최종적으로 확인할 리스트들 지정
 date_sum = []
 money_sum = []
 number_sum = []
 region_sum = []
 
+##지역 패턴을 만들어 준다
+pattern = re.compile(r'대전|충청|충북|충남|세종')
+### re.search(pattern, 지역명) # 해당 지역이 있으면 True, 없으면 False로 뜰 것이다.
+
+## 총 5개의 페이지(최대)로 설정
 pages = 5
 
+## 최대 5개의 페이로 지정한 부분을 for문으로 돌림
+## 물론 전체 페이지를 돌리지 않고, 일정 조건에 부합하면 break 할 예정
 for i in range(pages):
     
+    ## 소스를 가져와 soup으로 정리
     html = driver.page_source
     soup = bs(html, 'lxml')
     
+    ## '클릭' 포함하여 총 6개의 원하는 '일회성' 정보를 가져옴
+    ## 추가적으로 date 라는 리스트를 생성하여, 원하는 날짜까지의 정보만 필터
+    ## ex) date_tem이 30개라도 date는 원하는 날짜에 멈추므로 17개가 되면, 그 17개에 한해서
+    ## 2억 또는 그 외 다른 조건들을 탐색
+    date_tem = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
+    money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
+    money = [int(i.replace('원','').replace(',','')) for i in money]
+    number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
+    region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
+    click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
+    date = [] 
+    
+    ## for 문을 통해서 1페이지씩 멈추고 싶은 날짜가 있는지 확인
+    ## 확인하여, 원하는 날짜까지만의 정보를 다시 가져올 예정
+    ## 기존의 date를 date_tem으로 바꾸고, 다시 date라는 List 생성
+    ## date라는 리스트에 원하는 조건까지만 추가!
 #==============================================================================
-#     date = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
-#     money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
-#     money = [int(i.replace('원','').replace(',','')) for i in money]
-#     number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
-#     region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
-#     click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
+#     for k in range(len(date_tem)):
+#         
+#         if date_tem[k] == '2017/07/19':
+#             break
+#         date.append(date_tem[k])
 #==============================================================================
     
-    # date를 원하는 곳까지 필터 못하겠습니다....
-    for j in range(len(date)):
+    ## 조건을 하나로 합쳐본다 : 날짜가 원하는 날짜가 안나오고, 금액이 1억이 넘으면 클릭
+    ## 클릭해서 원하는 지역의 조건이 맞는지 확인해본다(매번 클릭할 때마다 html 새로 지정)
+    for k in range(len(date_tem)):
         
-            date = [j.text.strip() for j in soup.find_all(attrs = {'class':'tc'}) if '/' in j.text]
-            money = [j.text.strip() for j in soup.find_all(attrs = {'class':'tr'}) if '원' in j.text]
-            money = [int(i.replace('원','').replace(',','')) for i in money]
-            number = [j.text.strip() for j in soup.find_all(name = 'a', attrs = {'href' : '#'})][1:]
-            region = [j.text.strip() for j in soup.find_all(attrs = {'class':'tl'})][1::2]
-            click = [j.text.strip() for j in soup.find_all(attrs = {'class':'default'}) if '더보기' in j.text]
+        if date_tem[k] != '2017/07/19' and money[k] >= 1e8:
             
-            if date[j] == '2017/07/21':
-                break
+            driver.find_element_by_link_text(number[k]).click()
+            html = driver.page_source
+            soup = bs(html, 'lxml')
+            
+            ## 첫번째로 '납품장소'를 확인한다
+            ## 지역이름이 들어갔는지 확인한다
+            ## 우선 if문으로 re 함수를 쓸 수 있는 방법이 안떠올라, 각각 or로 입력한다.
+            ## 'class'가 'tl'일 때 가장 첫번 째 나오는 값이 '납품장소'의 값이므로 아래와 같이 입력한다
+            if '대전'or'충청'or'충북'or'충남'or'세종' in soup.find(attrs = {'class':'tl'}).text.strip():
+                
+            ## 그다음 두번째로는 '공사명'을 확인한다
+            ## 이 또한 지역이름이 들어갔는지 확인한다
+            ## '공사명'의 값은 colspan:5 인 유일한 값이므로 아래와 같이 입력한다
+            else if '대전'or'충청'or'충북'or'충남'or'세종' in soup.find(attrs = {'colspan':'5'}).text.strip():
+            
+            ## 마지막으로 '발주(공고)기관'의 전화번호를 확인한다
+            
+            else if 
+                
+                
+        else if date_tem[k] == '2017/07/19':
+            break
     
-    
-    
+    ## '클릭(+더보기)' 버튼을 누름
+    ## 단, 클릭 버튼이 없으면 error가 뜨기 때문에(page 수를 최대 5로 지정했으나, 그보다 적을 경우)
+    ## 클릭 버튼이 없을 경우 break를 할 수 있는 조건문 생성
+    if click != []:
+        driver.find_element_by_link_text(click[0]).click()
+    else:
+        break
+
+
+            
 '''
     우선 if문으로 지정한 날짜가 맞으면 멈춤!
     if date[j] == week_day_ago:

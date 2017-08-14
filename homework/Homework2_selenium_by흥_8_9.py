@@ -11,7 +11,7 @@ import pandas as pd
 import re
 import datetime
 
-driver = wb.Chrome('C:/Users/Whi Kwon/Documents/Github/python_script/chromedriver.exe')
+driver = wb.Chrome('C:/Users/HS/Desktop/과외/studyroom/chromedriver.exe')
 driver.implicitly_wait(2)
 
 today = datetime.date.today()
@@ -52,7 +52,7 @@ for i in range(pages): ### 돌아가는 지 확인을 위해 pages = 1로 지정
 
     ### 데이터 가진거에 대해서 개수만큼 순차적으로 확인.
     for j in range(len(date)):
-        ### date 조건 걸어서 부합하면 for문 break하기. 
+        ### date 조건 걸어서 부합하면 for문 break하기.
         ### 코드가 실행되는 지 확인하는 방법은 중간 결과를 출력해보는 거 밖에 없다. 
         ### 아래 예시로 들면 원래 변수가 들어가야 할 자리에 '2017/08/01' 값을 입력해보고
         ### 날짜가 충족했을 때 'BREAK' 과 함께 for문을 break하도록, 외에는 날짜를 출력하도록 해보면
