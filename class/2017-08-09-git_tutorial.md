@@ -21,13 +21,20 @@ comments: true
 3. (branch1) **git commit -m** "변경 사항" <br>
 : 파일 수정 후 해당 변경 사항을 commit해준다.  
 
-4. (master) **git pull origin** [master] <br>
+4. (branch1) **git pull --rebase origin** [master] <br>
 : 온라인 저장소의 master 내용과 동기화시킬 때 사용한다. 수정 내용을 push하기 전에 항상 먼저 사용해야 한다.
+  - conflict가 발생할 경우 git rebase --abort를 입력하면 pull 이전 상태로 돌아간다.
+  - conflict를 해결하고 push하고 싶은 경우엔 git add *충돌 파일명*, git rebase --continue를 입력해주자.
+  이 때, master는 continue된 commit 뒤에 존재하게 된다. (master는 따로 merge해줘야 함.)
 
-5. (master) **git merge** *branch1* <br>
+5. (github사이트) **New pull requests**  <br>
+: pull requests 창을 열어서 merge하려는 변경 사항에 대한 논의, 피드백, 수정을 진행한다.
+그리고 해당 수정 완료 후 해당 창에서 merge를 수행한 후에 로컬에 master를 pull한다.
+
+6. (master) **git merge** *branch1* <br>
 : master와 branch1을 합친다.
 
-6. (master) **git push origin** [master] <br>
+7. (master) **git push -u origin** [master] <br>
 : 로컬 저장소의 내용을 온라인 저장소의 master에 업로드한다.
 
 ***
@@ -182,4 +189,5 @@ git 내에서 이루어지는 활동을 도식화해놓은 그림은 아래와 �
 
 Reference: <br>
 [생활코딩 - 지옥에서 온 Git](https://opentutorials.org/course/2708) <br>
-Git 데이터 흐름 이미지 : https://onezeronull.com/2015/04/10/git-diagram-for-data-transport-commands/
+[아틀라시안 - Git 협업 flow 설명](https://www.atlassian.com/git/tutorials/comparing-workflows) <br>
+Git 데이터 흐름 이미지 : https://onezeronull.com/2015/04/10/git-diagram-for-data-transport-commands/ <br>
