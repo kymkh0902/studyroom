@@ -19,8 +19,9 @@ import xlwings as xw
 from xlwings.constants import DeleteShiftDirection
 import win32com.client
 
-
 os.chdir('C:/Users/HS/Desktop/과외/studyroom/숙제(흥)/일일영업현황')
+
+
 
 
 ## date 관련된 사항을 정리한다
@@ -217,93 +218,129 @@ if (dateD == '01' or '02' or '03') and date.weekday() == 1:
 else:
     copy9 = sht1.range('U38').value
 
-for i in range(1, 30):
-    if sht6.range('AN{}'.format(i)).value == c:
-        sht7.range('D4').value = copy9
-        sht6.range('AM{}'.format(i)).value = copy9
-        sht7.range('C4').value = sht6.range('AP{}'.format(i)).value
-        sht7.range('B4').value = sht6.range('AR{}'.format(i)).value
-        sht6.range('AQ{}'.format(i)).value = sht6.range('AM{}'.format(i)).value - sht6.range('AP{}'.format(i)).value
-        sht6.range('AS{}'.format(i)).value = sht6.range('AM{}'.format(i)).value - sht6.range('AR{}'.format(i)).value
 
+
+
+## 마감자료(매월 첫번째 근무날일 때)와 일반 자료를 구분하여 값을 복사한다
+
+if (dateD == '01' or '02' or '03') and date.weekday() == 1:
+    sht7.range('D10').value = copy9
+    sht6.range('AM25').value = copy9
+    sht7.range('C10').value = sht6.range('AP25').value
+    sht6.range('AQ25').value = sht6.range('AM25').value - sht6.range('AP25').value
+    sht6.range('AS25').value = sht6.range('AM25').value - sht6.range('AR25').value
+
+else:
+    for i in range(1, 30):
+
+        if sht6.range('AN{}'.format(i)).value == dateD:
+
+            sht7.range('D4').value = copy9
+            sht6.range('AM{}'.format(i)).value = copy9
+            sht7.range('C4').value = sht6.range('AP{}'.format(i)).value
+            sht7.range('B4').value = sht6.range('AR{}'.format(i)).value
+            sht6.range('AQ{}'.format(i)).value = sht6.range('AM{}'.format(i)).value - sht6.range('AP{}'.format(i)).value
+            sht6.range('AS{}'.format(i)).value = sht6.range('AM{}'.format(i)).value - sht6.range('AR{}'.format(i)).value
 
 wb2.close()
 wb3.close()
 
-#%%
 
-# DC 파일 수정하기
+
+
+## DC 파일을 수정한다
+## DC파일을 수정할 파일을 열어 필요한 시트를 지정한다
 
 wb4 = xw.Book('{}_DC율.xlsx'.format(b))
 wb5 = xw.Book('{}_미출하(2).xls'.format(a))
 wb6 = xw.Book('{}_출하(2).xls'.format(a))
 
-
 sht8 = wb4.sheets['로데이터']
-sht9 = wb5.sheets['Sheet1']
-sht10 = wb6.sheets['Sheet1']
+sht9 = wb5.sheets['{}_미출하'.format(a)]
+sht10 = wb6.sheets['{}_출하'.format(a)]
 sht11 = wb4.sheets['PriceList']
-
 
 sht9.range('A1:CC1').api.Delete(DeleteShiftDirection.xlShiftUp)
 sht10.range('A1:CC1').api.Delete(DeleteShiftDirection.xlShiftUp)
 
+copy10 = sht9.range('A1:CC6000').value
+copy11 = sht10.range('A1:CC6000').value
 
-copy10 = sht9.range('A1:CC5000').value
-copy11 = sht10.range('A1:CC5000').value
-           
-
-sht8.range('I3:CK5002').value = copy10
+sht8.range('I3:CK6002').value = copy10
 
 
-for j in range(3, 5002):
+
+
+## 미출하를 먼저 복사한 뒤, 출하 파일을 복사할 것이다
+## 넉넉하게 6,000개의 행을 복사하는 것으로 했으나,
+## 실질적으로 6,000개가 되지 않을 것이기 때문에, 빈칸이 있으면 그 부분부터 출하 파일을 복사한다
+
+for j in range(3, 6002):
     if sht8.range('I{}'.format(j)).value == None:
-        sht8.range('I{}:CK5002'.format(j)).value = copy11
+        sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
-          
-    
+
 wb4.save('{}_DC율(2).xlsx'.format(b))
 
+######################################## 검토 필요 ###########################################
 
-copy11 = sht8.range('A3:H5002').value
-sht8.range('A3:H5002').value = copy11
-      
+copy12 = sht8.range('A1:H1').value
+sht8.range('A3:H6002').value = copy12
+
+
+
+
+## 제외 / 포함 중에 제외된 항목들 모두 삭제
 
 k = 3
-while k < 5002:
+while k < 6002:
     if sht8.range('B{}'.format(k)).value == '02. 제외':
-        sht8.range('A{}:CC{}'.format(k,k)).api.delete
+        sht8.range('A{}:CE{}'.format(k,k)).api.delete
     elif sht8.range('B{}'.format(k)).value == '01. 포함':
         k = k+1
-    else : break    
-          
-          
-for o in range(33600, 35000):
+    else : break
+
+for o in range(33600, 40000):
     if sht11.range('A{}'.format(o)).value == None:
         break
-    
-    
-for l in range(3, 5002):
+
+
+
+
+## 구가격없음 파일을 복사하여 범용 또는 전략 제품으로 변환하는 작업을 수행
+## o는 바로 위에 있는 for문의 o가 맞으며, 아래 for문에서 o=o+1 작업을 수행하여
+## 계속 for문을 돌릴 수 있도록 한다 (Global 변수 사용)
+
+for l in range(3, 6002):
     if sht8.range('E{}'.format(l)).value == '구가격없음':
         sht11.range('A{}:B{}'.format(o,o)).value = sht8.range('O{}:P{}'.format(l,l)).value
         sht11.range('D{}'.format(o)).value = sht8.range('D{}'.format(l)).value
         sht11.range('G{}'.format(o)).value = sht8.range('F{}'.format(l)).value
         o = o+1
 
+############################# 검토 필요 #############################
 
-for n in range(33600, 35000):
+for n in range(33600, 40000):
     if sht11.range('D{}'.format(n)).value == '전력기기_범용제품_2016_1':
         sht11.range('G{}'.format(n)).value = sht11.range('G{}'.format(n)).value/(1-0.294)
+    elif sht11.range('D{}'.format(n)).value == None:
+        break
+    else:
+        pass
 
+############################# 검토 필요 #############################
 
-for m in range(33600, 35000):
+for m in range(33600, 40000):
     if sht11.range('D{}'.format(m)).value == '전력기기_범용제품_2016_1':
         sht11.range('D{}'.format(m)).value = '신규등록_범용'
     elif sht11.range('D{}'.format(m)).value == '전력기기_전략제품_2016_1':
         sht11.range('D{}'.format(m)).value = '신규등록_전략'
+    elif sht11.range('D{}'.format(m)).value == None:
+        break
+    else:
+        pass
 
-
-for p in range(3, 5002):
+for p in range(3, 6002):
     if sht8.range('E{}'.format(p)).value == '구가격없음' and \
                  sht8.range('D{}'.format(p)).value == '전력기기_범용제품_2016_1':
                      sht8.range('D{}'.format(p)).value = '신규등록_범용'
@@ -315,43 +352,39 @@ for p in range(3, 5002):
                      sht8.range('D{}'.format(p)).value = '신규등록_전략'
                      sht8.range('E{}'.format(p)).value = '신규등록_전략'
 
-
-
 wb4.save('{}_DC율(3).xlsx'.format(b))
 wb4.close()
 wb5.close()
 wb6.close()
 
 
+
+
+## DC파일의 제일 첫번째 시트인 DC율 특약점별 시트의 피벗을 새로고침하기 위해서
+## win32com을 사용할 것이다
+## 아래는 피벗을 새로고침하는 코딩
+
 office = win32com.client.Dispatch("Excel.Application")
 wb = office.Workbooks.Open(r"C:/Users/hslee3/Desktop/일일영업현황/{}_DC율(3).xlsx".format(b))
 
-
 count = wb.Sheets.Count
 
-
-for i in range(count):
-    ws = wb.Worksheets[i]
+for q in range(count):
+    ws = wb.Worksheets[q]
     ws.Unprotect() # IF protected
-
-
     pivotCount = ws.PivotTables().Count
-    for j in range(1, pivotCount+1):
-        ws.PivotTables(j).PivotCache().Refresh()
-
+    for z in range(1, pivotCount+1):
+        ws.PivotTables(z).PivotCache().Refresh()
 
 wb.Close(True)
-
-
 wb7 = xw.Book('{}_DC율(3).xlsx'.format(b))
-
-
 sht12 = wb7.sheets['DC율 특약점별']
 
 
-#%%
 
-# DC 원본으로 옮기기
+
+## 이제 최종적으로 수정한 DC파일의 값을 원본 파일로 옮기는 작업 수행
+## 최종 작업만 남은 상황이다
 
 sht1.range('BD5:BD12').options(ndim=2).value = sht12.range('D5:D12').options(ndim=2).value
 sht1.range('BD15:BD20').options(ndim=2).value = sht12.range('D13:D18').options(ndim=2).value
@@ -359,45 +392,40 @@ sht1.range('BD22:BD25').options(ndim=2).value = sht12.range('D19:D22').options(n
 sht1.range('BD38').value = sht12.range('D23').value
 
 
+
+
+## 여기가 중요한 부분이다
+## 대전1, 대전2, 대전3의 별도의 평균 DC율을 따로 구하는 식이다
+
 dae1b = 0
 dae1c = 0
 dae2b = 0
 dae2c = 0
 dae3b = 0
 dae3c = 0
-          
 
-for q in range(5, 13):
-    dae1b = dae1b + float(sht12.range('B{}'.format(q)).value)
+for r in range(5, 13):
+    dae1b = dae1b + float(sht12.range('B{}'.format(r)).value)
 
+for s in range(13, 19):
+    dae2b = dae2b + float(sht12.range('B{}'.format(s)).value)
 
-for r in range(13, 19):
-    dae2b = dae2b + float(sht12.range('B{}'.format(r)).value)
+for t in range(19, 23):
+    dae3b = dae3b + float(sht12.range('B{}'.format(t)).value)
 
+for u in range(5, 13):
+    dae1c = dae1c + float(sht12.range('C{}'.format(u)).value)
 
-for s in range(19, 23):
-    dae3b = dae3b + float(sht12.range('B{}'.format(s)).value)
+for v in range(13, 19):
+    dae2c = dae2c + float(sht12.range('C{}'.format(v)).value)
 
-
-for t in range(5, 13):
-    dae1c = dae1c + float(sht12.range('C{}'.format(t)).value)
-
-
-for u in range(13, 19):
-    dae2c = dae2c + float(sht12.range('C{}'.format(u)).value)
-
-
-for v in range(19, 23):
-    dae3c = dae3c + float(sht12.range('C{}'.format(v)).value)
-
+for w in range(19, 23):
+    dae3c = dae3c + float(sht12.range('C{}'.format(w)).value)
 
 sht1.range('BD14').value = float(1 - (dae1c/dae1b))
 sht1.range('BD21').value = float(1 - (dae2c/dae2b))
 sht1.range('BD26').value = float(1 - (dae3c/dae3b))
 
-
 wb7.close()
-wb1.save('원본_{}(by흥)(2).xls'.format(b))
-
-
+wb1.save('원본_{}(by흥).xls'.format(a))
 
