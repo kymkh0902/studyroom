@@ -80,9 +80,11 @@ data1 = data1[data1['Price List'].str.contains
 data1 = data1[data1['Department'].str.contains(r'대전Part')]
 del data1['Unnamed: 0']
 del data1['Drop Ship Flag']
+del data1['Country']
+del data1['Line Additional Remarks']
 del data1['Releated Managing No.']
 del data1['File Attached']
-del data1['Unnamed: 75']
+del data1['Unnamed: 77']
 
 data1.to_excel('{}_미출하(2).xls'.format(a), index=False)
 
@@ -93,9 +95,11 @@ data2 = data2[data2['Price List'].str.contains
 data2 = data2[data2['Department'].str.contains(r'대전Part')]
 del data2['Unnamed: 0']
 del data2['Drop Ship Flag']
+del data2['Country']
+del data2['Line Additional Remarks']
 del data2['Releated Managing No.']
 del data2['File Attached']
-del data2['Unnamed: 75']
+del data2['Unnamed: 77']
 
 data2.to_excel('{}_출하(2).xls'.format(a), index=False)
 
@@ -119,6 +123,7 @@ data3['Customer(B)'][data3['Customer(B)'].str.contains(r'에이스')] = '(주)�
 data3['Customer(B)'][data3['Customer(B)'].str.contains(r'대건산')] = '(주)대건산전_대전_Lel'
 data3['Customer(B)'][data3['Customer(B)'].str.contains(r'홈플러스|보령')] = 'Retrofit'
 data3['Customer(B)'][data3['Customer(B)'].str.contains(r'주안전기')] = 'AMR'
+data3['SPG'][data3['SPG'].str.contains(r'Transf')] = 'Transformer'
 
 data3.to_excel('{}_일반(2).xls'.format(a), index=False)
 
@@ -189,7 +194,7 @@ sht5.range('A1:AZ2500').value = copy8
 ## 만약에 마감자료를 만들 경우(매월 첫번째 근무일)에는
 ## U38 셀이 아닌, O38 셀을 복사해야 한다. 따라서 이 작업은 지금 수행하도록 하겠다.
 
-if (dateD == '01' or dateD = '02' or dateD == '03') and date.weekday() == 1:
+if (dateD == '01' or dateD == '02' or dateD == '03') and date.weekday() == 1:
     copy9 = sht1.range('O38').value
 else:
     copy9 = sht1.range('U38').value
@@ -205,7 +210,6 @@ if (dateD == '01' or dateD == '02' or dateD == '03') and date.weekday() == 1:
 
 else:
     for i in range(1, 30):
-
         if sht6.range('AN{}'.format(i)).value == dateD:
             sht7.range('D4').value = copy9
             sht6.range('AM{}'.format(i)).value = copy9
@@ -216,6 +220,9 @@ else:
 
 wb2.close()
 wb3.close()
+
+
+
 
 ## DC 파일을 수정한다
 ## DC파일을 수정할 파일을 열어 필요한 시트를 지정한다
@@ -246,12 +253,29 @@ for j in range(3, 6002):
         sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
 
-wb4.save('{}_DC율(2).xlsx'.format(b))
+## 수식을 대입한다 / 수식을 대입한 후, 값 복사를 통해 파일의 무게를 줄일 것이다.
 
-######################################## 검토 필요 ###########################################
+j = 0
+for j in range(3, 6002):
+    if sht8.range('I{}'.format(j)).value != None:
+        sht8.range('A{}'.format(j)).value == '=VLOOKUP(D{},구분!$A$1:$B$35,2,0)'.format(j)
+        sht8.range('B{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,2,0)'
+        sht8.range('C{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,3,0)'
+        sht8.range('D{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$D$40000,4,0),U{})'
+        sht8.range('E{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$K$40000,4,0),"구가격없음")'
+        sht8.range('F{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!A:K,7,0),V{})'
+        sht8.range('G{}'.format(j)).value == '=IF(A{}="01. 범용",F{}*R{},(F{}/(1-0.307)*R{}))'
+        sht8.range('H{}'.format(j)).value == '=X{}'
+    else:
+        break
 
-copy12 = sht8.range('A1:H1').value
-sht8.range('A3:H6002').value = copy12
+
+
+
+## DC율(2) 파일은 수식이 걸려있는 파일이다
+## 이 수식은 계속 써야하므로 DC율(2)로 별도로 저장을 해 놓는 것이고
+## 수식이 많아서 무거워진 파일 이므로 DC율(3) 또는 다음 날짜로 지정된
+## 파일에는 값복사를 통해 파일 무게를 줄일 것이다
 
 ## 제외 / 포함 중에 제외된 항목들 모두 삭제
 
@@ -268,6 +292,9 @@ for o in range(33600, 40000):
     if sht11.range('A{}'.format(o)).value == None:
         break
 
+
+
+
 ## 구가격없음 파일을 복사하여 범용 또는 전략 제품으로 변환하는 작업을 수행
 ## o는 바로 위에 있는 for문의 o가 맞으며, 아래 for문에서 o=o+1 작업을 수행하여
 ## 계속 for문을 돌릴 수 있도록 한다 (Global 변수 사용)
@@ -279,8 +306,6 @@ for l in range(3, 6002):
         sht11.range('G{}'.format(o)).value = sht8.range('F{}'.format(l)).value
         o = o + 1
 
-############################# 검토 필요 #############################
-
 for n in range(33600, 40000):
     if sht11.range('D{}'.format(n)).value == '전력기기_범용제품_2016_1':
         sht11.range('G{}'.format(n)).value = sht11.range('G{}'.format(n)).value / (1 - 0.294)
@@ -288,8 +313,6 @@ for n in range(33600, 40000):
         break
     else:
         pass
-
-############################# 검토 필요 #############################
 
 for m in range(33600, 40000):
     if sht11.range('D{}'.format(m)).value == '전력기기_범용제품_2016_1':
@@ -313,10 +336,20 @@ for p in range(3, 6002):
         sht8.range('D{}'.format(p)).value = '신규등록_전략'
         sht8.range('E{}'.format(p)).value = '신규등록_전략'
 
+wb4.save('{}_DC율(2).xlsx'.format(b))
+
+
+copy12 = sht8.range('A3:H6002').value
+sht8.range('A3:H6002').value = copy12
+
+
 wb4.save('{}_DC율.xlsx'.format(a))
 wb4.close()
 wb5.close()
 wb6.close()
+
+
+
 
 ## DC파일의 제일 첫번째 시트인 DC율 특약점별 시트의 피벗을 새로고침하기 위해서
 ## win32com을 사용할 것이다
@@ -341,10 +374,10 @@ sht12 = wb7.sheets['DC율 특약점별']
 ## 이제 최종적으로 수정한 DC파일의 값을 원본 파일로 옮기는 작업 수행
 ## 최종 작업만 남은 상황이다
 
-sht1.range('BD5:BD12').options(ndim=2).value = sht12.range('D5:D12').options(ndim=2).value
-sht1.range('BD15:BD20').options(ndim=2).value = sht12.range('D13:D18').options(ndim=2).value
-sht1.range('BD22:BD25').options(ndim=2).value = sht12.range('D19:D22').options(ndim=2).value
-sht1.range('BD38').value = sht12.range('D23').value
+sht1.range('BD5:BD12').options(ndim=2).value = sht12.range('D6:D13').options(ndim=2).value
+sht1.range('BD15:BD20').options(ndim=2).value = sht12.range('D14:D19').options(ndim=2).value
+sht1.range('BD22:BD25').options(ndim=2).value = sht12.range('D20:D23').options(ndim=2).value
+sht1.range('BD38').value = sht12.range('D24').value
 
 ## 여기가 중요한 부분이다
 ## 대전1, 대전2, 대전3의 별도의 평균 DC율을 따로 구하는 식이다
