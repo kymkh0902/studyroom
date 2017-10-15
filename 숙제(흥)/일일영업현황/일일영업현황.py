@@ -253,6 +253,22 @@ for j in range(3, 6002):
         sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
 
+## 수식을 대입한다 / 수식을 대입한 후, 값 복사를 통해 파일의 무게를 줄일 것이다.
+
+j = 0
+for j in range(3, 6002):
+    if sht8.range('I{}'.format(j)).value != None:
+        sht8.range('A{}'.format(j)).value == '=VLOOKUP(D{},구분!$A$1:$B$35,2,0)'.format(j)
+        sht8.range('B{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,2,0)'
+        sht8.range('C{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,3,0)'
+        sht8.range('D{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$D$40000,4,0),U{})'
+        sht8.range('E{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$K$40000,4,0),"구가격없음")'
+        sht8.range('F{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!A:K,7,0),V{})'
+        sht8.range('G{}'.format(j)).value == '=IF(A{}="01. 범용",F{}*R{},(F{}/(1-0.307)*R{}))'
+        sht8.range('H{}'.format(j)).value == '=X{}'
+    else:
+        break
+
 
 
 
@@ -260,7 +276,6 @@ for j in range(3, 6002):
 ## 이 수식은 계속 써야하므로 DC율(2)로 별도로 저장을 해 놓는 것이고
 ## 수식이 많아서 무거워진 파일 이므로 DC율(3) 또는 다음 날짜로 지정된
 ## 파일에는 값복사를 통해 파일 무게를 줄일 것이다
-############################### 속도가 현저히 느려지므로 검토 필요 ##########################################
 
 ## 제외 / 포함 중에 제외된 항목들 모두 삭제
 

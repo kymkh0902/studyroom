@@ -185,6 +185,9 @@ sht5.clear_contents()
 copy8 = sht4.range('A1:AZ2500').value
 sht5.range('A1:AZ2500').value = copy8
 
+
+
+
 ## 금일 자원율을 그래프 있는 sheet 표가 있는 sheet로 복사하는 작업이다.
 ## 이 또한 수정해야 할 것이 몇 가지 있다.
 ## 만약에 마감자료를 만들 경우(매월 첫번째 근무일)에는
@@ -248,6 +251,11 @@ for j in range(3, 6002):
         sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
 
+wb4.save('170918_DC율(2).xlsx')
+
+copy12 = sht8.range('A3:H6002').value
+sht8.range('A3:H6002').value = copy12
+
 
 
 
@@ -271,6 +279,9 @@ for o in range(33600, 40000):
     if sht11.range('A{}'.format(o)).value == None:
         break
 
+
+
+
 ## 구가격없음 파일을 복사하여 범용 또는 전략 제품으로 변환하는 작업을 수행
 ## o는 바로 위에 있는 for문의 o가 맞으며, 아래 for문에서 o=o+1 작업을 수행하여
 ## 계속 for문을 돌릴 수 있도록 한다 (Global 변수 사용)
@@ -282,8 +293,6 @@ for l in range(3, 6002):
         sht11.range('G{}'.format(o)).value = sht8.range('F{}'.format(l)).value
         o = o + 1
 
-############################# 검토 필요 #############################
-
 for n in range(33600, 40000):
     if sht11.range('D{}'.format(n)).value == '전력기기_범용제품_2016_1':
         sht11.range('G{}'.format(n)).value = sht11.range('G{}'.format(n)).value / (1 - 0.294)
@@ -291,8 +300,6 @@ for n in range(33600, 40000):
         break
     else:
         pass
-
-############################# 검토 필요 #############################
 
 for m in range(33600, 40000):
     if sht11.range('D{}'.format(m)).value == '전력기기_범용제품_2016_1':
@@ -316,15 +323,33 @@ for p in range(3, 6002):
         sht8.range('D{}'.format(p)).value = '신규등록_전략'
         sht8.range('E{}'.format(p)).value = '신규등록_전략'
 
-wb4.save('170918_DC율(2).xlsx')
-
-copy12 = sht8.range('A3:H6002').value
-sht8.range('A3:H6002').value = copy12
-
 wb4.save('170918_DC율(3).xlsx')
-wb4.close()
 wb5.close()
 wb6.close()
+
+
+
+
+## (3)파일의 PriceList sheet를 (2)파일의 PriceList로 옮긴다
+## 왜냐하면 (2)파일은 계속 쓸 것이기 때문에, 추가적으로 업데이트를 하는 것이다
+## 이렇게 해야 최적의 속도를 낼 수 있는 것으로 판단
+
+wb8 = xw.Book('170918_DC율(2).xlsx')
+
+sht11 = wb4.sheets['PriceList']
+sht13 = wb8.sheets['PriceList']
+
+for x in range(33670, 40000):
+    if sht11.range('A{}'.format(x)).value == None:
+        break
+
+copy13 = sht11.range('A33670:G{}'.format(x-1)).value
+sht13.range('A33670:G{}'.format(x-1)).value = copy13
+
+wb8.save('170918_DC율(2).xlsx')
+wb4.save('170918_DC율(3).xlsx')
+wb8.close()
+wb4.close()
 
 ## DC파일의 제일 첫번째 시트인 DC율 특약점별 시트의 피벗을 새로고침하기 위해서
 ## win32com을 사용할 것이다
