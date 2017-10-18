@@ -80,7 +80,7 @@ data1 = data1[data1['Price List'].str.contains
 data1 = data1[data1['Department'].str.contains(r'대전Part')]
 del data1['Unnamed: 0']
 del data1['Drop Ship Flag']
-del data1['Country']
+del data1['Country.1']
 del data1['Line Additional Remarks']
 del data1['Releated Managing No.']
 del data1['File Attached']
@@ -95,7 +95,7 @@ data2 = data2[data2['Price List'].str.contains
 data2 = data2[data2['Department'].str.contains(r'대전Part')]
 del data2['Unnamed: 0']
 del data2['Drop Ship Flag']
-del data2['Country']
+del data2['Country.1']
 del data2['Line Additional Remarks']
 del data2['Releated Managing No.']
 del data2['File Attached']
@@ -145,9 +145,9 @@ wb2 = xw.Book('{}_일반(2).xls'.format(a))
 wb3 = xw.Book('{}_신제품(2).xls'.format(a))
 
 sht1 = wb1.sheets['대전']
-sht2 = wb2.sheets['{}_일반'.format(a)]
+sht2 = wb2.sheets['sheet1']
 sht3 = wb1.sheets['원본Data']
-sht4 = wb3.sheets['{}_신제품'.format(a)]
+sht4 = wb3.sheets['sheet1']
 sht5 = wb1.sheets['신제품시트']
 sht6 = wb1.sheets['주문 현황']
 sht7 = wb1.sheets['Sheet2']
@@ -188,6 +188,9 @@ sht5.clear_contents()
 
 copy8 = sht4.range('A1:AZ2500').value
 sht5.range('A1:AZ2500').value = copy8
+
+
+
 
 ## 금일 자원율을 그래프 있는 sheet 표가 있는 sheet로 복사하는 작업이다.
 ## 이 또한 수정해야 할 것이 몇 가지 있다.
@@ -232,8 +235,8 @@ wb5 = xw.Book('{}_미출하(2).xls'.format(a))
 wb6 = xw.Book('{}_출하(2).xls'.format(a))
 
 sht8 = wb4.sheets['로데이터']
-sht9 = wb5.sheets['{}_미출하'.format(a)]
-sht10 = wb6.sheets['{}_출하'.format(a)]
+sht9 = wb5.sheets['sheet1']
+sht10 = wb6.sheets['sheet1']
 sht11 = wb4.sheets['PriceList']
 
 sht9.range('A1:CC1').api.Delete(DeleteShiftDirection.xlShiftUp)
@@ -253,21 +256,10 @@ for j in range(3, 6002):
         sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
 
-## 수식을 대입한다 / 수식을 대입한 후, 값 복사를 통해 파일의 무게를 줄일 것이다.
+wb4.save('171012_DC율(2).xlsx')
 
-j = 0
-for j in range(3, 6002):
-    if sht8.range('I{}'.format(j)).value != None:
-        sht8.range('A{}'.format(j)).value == '=VLOOKUP(D{},구분!$A$1:$B$35,2,0)'.format(j)
-        sht8.range('B{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,2,0)'
-        sht8.range('C{}'.format(j)).value == '=VLOOKUP(BS{},구분!$E$1:$G$19,3,0)'
-        sht8.range('D{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$D$40000,4,0),U{})'
-        sht8.range('E{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!$A$1:$K$40000,4,0),"구가격없음")'
-        sht8.range('F{}'.format(j)).value == '=IFERROR(VLOOKUP(O{},PriceList!A:K,7,0),V{})'
-        sht8.range('G{}'.format(j)).value == '=IF(A{}="01. 범용",F{}*R{},(F{}/(1-0.307)*R{}))'
-        sht8.range('H{}'.format(j)).value == '=X{}'
-    else:
-        break
+copy12 = sht8.range('A3:H6002').value
+sht8.range('A3:H6002').value = copy12
 
 
 
@@ -336,17 +328,32 @@ for p in range(3, 6002):
         sht8.range('D{}'.format(p)).value = '신규등록_전략'
         sht8.range('E{}'.format(p)).value = '신규등록_전략'
 
-wb4.save('{}_DC율(2).xlsx'.format(b))
-
-
-copy12 = sht8.range('A3:H6002').value
-sht8.range('A3:H6002').value = copy12
-
-
-wb4.save('{}_DC율.xlsx'.format(a))
-wb4.close()
+wb4.save('{}_DC율(3).xlsx'.format(b))
 wb5.close()
 wb6.close()
+
+
+
+
+## (3)파일의 PriceList sheet를 (2)파일의 PriceList로 옮긴다
+## 왜냐하면 (2)파일은 계속 쓸 것이기 때문에, 추가적으로 업데이트를 하는 것이다
+## 이렇게 해야 최적의 속도를 낼 수 있는 것으로 판단
+
+wb8 = xw.Book('{}_DC율(2).xlsx'.format(b))
+
+sht11 = wb4.sheets['PriceList']
+sht13 = wb8.sheets['PriceList']
+
+for x in range(33670, 40000):
+    if sht11.range('A{}'.format(x)).value == None:
+        break
+
+copy13 = sht11.range('A33670:G{}'.format(x-1)).value
+sht13.range('A33670:G{}'.format(x-1)).value = copy13
+
+wb8.save('{}_DC율.xlsx'.format(a))
+wb8.close()
+wb4.close()
 
 
 
@@ -356,7 +363,7 @@ wb6.close()
 ## 아래는 피벗을 새로고침하는 코딩
 
 office = win32com.client.Dispatch("Excel.Application")
-wb = office.Workbooks.Open(r"C:/Users/hslee3/Desktop/일일영업현황/{}_DC율.xlsx".format(a))
+wb = office.Workbooks.Open(r"C:/Users/hslee3/Desktop/일일영업현황/{}_DC율(3).xlsx".format(b))
 
 count = wb.Sheets.Count
 
@@ -368,7 +375,7 @@ for q in range(count):
         ws.PivotTables(z).PivotCache().Refresh()
 
 wb.Close(True)
-wb7 = xw.Book('{}_DC율.xlsx'.format(a))
+wb7 = xw.Book('{}_DC율(3).xlsx'.format(b))
 sht12 = wb7.sheets['DC율 특약점별']
 
 ## 이제 최종적으로 수정한 DC파일의 값을 원본 파일로 옮기는 작업 수행

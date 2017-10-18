@@ -61,16 +61,16 @@ else:
 ## 일일영업현황을 보내는 당일에 다운 받은 미출하, 출하, 일반, 신제품 파일을
 ## 열어, 가공을 시작한다
 
-data1 = pd.read_csv('170921_미출하.xls', sep='\t',
+data1 = pd.read_csv('171013_미출하.xls', sep='\t',
                     encoding='euc-kr', engine='python')
 
-data2 = pd.read_csv('170921_출하.xls', sep='\t',
+data2 = pd.read_csv('171013_출하.xls', sep='\t',
                     encoding='euc-kr', engine='python', )
 
-data3 = pd.read_csv('170921_일반.xls', sep='\t',
+data3 = pd.read_csv('171013_일반.xls', sep='\t',
                     encoding='euc-kr', engine='python', )
 
-data4 = pd.read_csv('170921_신제품.xls', sep='\t',
+data4 = pd.read_csv('171013_신제품.xls', sep='\t',
                     encoding='euc-kr', engine='python', )
 
 ## 미출하 파일을 가공하여, 미출하(2)로 저장한다
@@ -80,11 +80,13 @@ data1 = data1[data1['Price List'].str.contains
 data1 = data1[data1['Department'].str.contains(r'대전Part')]
 del data1['Unnamed: 0']
 del data1['Drop Ship Flag']
+del data1['Country.1']
+del data1['Line Additional Remarks']
 del data1['Releated Managing No.']
 del data1['File Attached']
-del data1['Unnamed: 75']
+del data1['Unnamed: 77']
 
-data1.to_excel('170921_미출하(2).xls', index=False)
+data1.to_excel('171013_미출하(2).xls', index=False)
 
 ## 출하 파일을 가공하여, 출하(2)로 저장한다
 
@@ -93,11 +95,13 @@ data2 = data2[data2['Price List'].str.contains
 data2 = data2[data2['Department'].str.contains(r'대전Part')]
 del data2['Unnamed: 0']
 del data2['Drop Ship Flag']
+del data2['Country.1']
+del data2['Line Additional Remarks']
 del data2['Releated Managing No.']
 del data2['File Attached']
-del data2['Unnamed: 75']
+del data2['Unnamed: 77']
 
-data2.to_excel('170921_출하(2).xls', index=False)
+data2.to_excel('171013_출하(2).xls', index=False)
 
 ## 일반 제품 파일을 가공하여, 일반(2)로 저장한다
 ## 이 파일은 추가적으로 신경을 써야한다 -> 새로운 수주를 할 경우, 이름이 독특할 수가 있음
@@ -121,7 +125,7 @@ data3['Customer(B)'][data3['Customer(B)'].str.contains(r'홈플러스|보령')] 
 data3['Customer(B)'][data3['Customer(B)'].str.contains(r'주안전기')] = 'AMR'
 data3['SPG'][data3['SPG'].str.contains(r'Transf')] = 'Transformer'
 
-data3.to_excel('170921_일반(2).xls', index=False)
+data3.to_excel('171013_일반(2).xls', index=False)
 
 ## 신제품 제품 파일을 가공하여, 신제품(2)로 저장한다
 
@@ -129,16 +133,16 @@ data4 = data4[data4['Department'].str.contains(r'대전Part')]
 del data4['Unnamed: 0']
 del data4['Unnamed: 35']
 
-data4.to_excel('170921_신제품(2).xls', index=False)
+data4.to_excel('171013_신제품(2).xls', index=False)
 
 ## 원본 데이터의 값을 수정한다.
 ## 일반 및 신제품 파일을 원본에 삽입하여 값을 수정할 것이며,
 ## 왜인지는 모르겠지만, DC파일을 먼저 수정해야 원본 값을 수정할 수 있는데,
 ## 이는 추가적으로 확인해보겠다
 
-wb1 = xw.Book('원본_170920(by흥).xls')
-wb2 = xw.Book('170921_일반(2).xls')
-wb3 = xw.Book('170921_신제품(2).xls')
+wb1 = xw.Book('원본_171012(by흥).xls')
+wb2 = xw.Book('171013_일반(2).xls')
+wb3 = xw.Book('171013_신제품(2).xls')
 
 sht1 = wb1.sheets['대전']
 sht2 = wb2.sheets['sheet1']
@@ -210,11 +214,11 @@ if (dateD == '01' or dateD == '02' or dateD == '03') and date.weekday() == 1:
 else:
     for i in range(1, 30):
         sht7.range('D4').value = copy9
-        sht6.range('AM18').value = copy9
-        sht7.range('C4').value = sht6.range('AP18').value
-        sht7.range('B4').value = sht6.range('AR18').value
-        sht6.range('AQ18').value = sht6.range('AM18').value - sht6.range('AP18').value
-        sht6.range('AS18').value = sht6.range('AM18').value - sht6.range('AR18').value
+        sht6.range('AM12').value = copy9
+        sht7.range('C4').value = sht6.range('AP12').value
+        sht7.range('B4').value = sht6.range('AR12').value
+        sht6.range('AQ12').value = sht6.range('AM12').value - sht6.range('AP12').value
+        sht6.range('AS12').value = sht6.range('AM12').value - sht6.range('AR12').value
 
 wb2.close()
 wb3.close()
@@ -225,9 +229,9 @@ wb3.close()
 ## DC 파일을 수정한다
 ## DC파일을 수정할 파일을 열어 필요한 시트를 지정한다
 
-wb4 = xw.Book('170918_DC율.xlsx')
-wb5 = xw.Book('170921_미출하(2).xls')
-wb6 = xw.Book('170921_출하(2).xls')
+wb4 = xw.Book('171012_DC율.xlsx')
+wb5 = xw.Book('171013_미출하(2).xls')
+wb6 = xw.Book('171013_출하(2).xls')
 
 sht8 = wb4.sheets['로데이터']
 sht9 = wb5.sheets['sheet1']
@@ -251,7 +255,7 @@ for j in range(3, 6002):
         sht8.range('I{}:CK6002'.format(j)).value = copy11
         break
 
-wb4.save('170918_DC율(2).xlsx')
+wb4.save('171012_DC율(2).xlsx')
 
 copy12 = sht8.range('A3:H6002').value
 sht8.range('A3:H6002').value = copy12
@@ -323,7 +327,7 @@ for p in range(3, 6002):
         sht8.range('D{}'.format(p)).value = '신규등록_전략'
         sht8.range('E{}'.format(p)).value = '신규등록_전략'
 
-wb4.save('170918_DC율(3).xlsx')
+wb4.save('171012_DC율(3).xlsx')
 wb5.close()
 wb6.close()
 
@@ -334,7 +338,7 @@ wb6.close()
 ## 왜냐하면 (2)파일은 계속 쓸 것이기 때문에, 추가적으로 업데이트를 하는 것이다
 ## 이렇게 해야 최적의 속도를 낼 수 있는 것으로 판단
 
-wb8 = xw.Book('170918_DC율(2).xlsx')
+wb8 = xw.Book('171012_DC율(2).xlsx')
 
 sht11 = wb4.sheets['PriceList']
 sht13 = wb8.sheets['PriceList']
@@ -346,8 +350,7 @@ for x in range(33670, 40000):
 copy13 = sht11.range('A33670:G{}'.format(x-1)).value
 sht13.range('A33670:G{}'.format(x-1)).value = copy13
 
-wb8.save('170918_DC율(2).xlsx')
-wb4.save('170918_DC율(3).xlsx')
+wb8.save('171013_DC율.xlsx')
 wb8.close()
 wb4.close()
 
@@ -356,7 +359,7 @@ wb4.close()
 ## 아래는 피벗을 새로고침하는 코딩
 
 office = win32com.client.Dispatch("Excel.Application")
-wb = office.Workbooks.Open(r"C:/Users/HS/Desktop/과외/studyroom/숙제(흥)/일일영업현황/170918_DC율(3).xlsx")
+wb = office.Workbooks.Open(r"C:/Users/HS/Desktop/과외/studyroom/숙제(흥)/일일영업현황/171012_DC율(3).xlsx")
 
 count = wb.Sheets.Count
 
@@ -368,7 +371,7 @@ for q in range(count):
         ws.PivotTables(z).PivotCache().Refresh()
 
 wb.Close(True)
-wb7 = xw.Book('170918_DC율(3).xlsx')
+wb7 = xw.Book('171012_DC율(3).xlsx')
 sht12 = wb7.sheets['DC율 특약점별']
 
 ## 이제 최종적으로 수정한 DC파일의 값을 원본 파일로 옮기는 작업 수행
@@ -412,5 +415,5 @@ sht1.range('BD21').value = float(1 - (dae2c / dae2b))
 sht1.range('BD26').value = float(1 - (dae3c / dae3b))
 
 wb7.close()
-wb1.save('원본_170921(by흥).xls')
+wb1.save('원본_171013(by흥).xls')
 
