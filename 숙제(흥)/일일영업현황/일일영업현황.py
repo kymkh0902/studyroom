@@ -411,7 +411,7 @@ for u in range(6, 14):
 for v in range(14, 20):
     dae2c = dae2c + float(sht12.range('C{}'.format(v)).value)
 
-for w in range(20, 24):
+fofor w in range(20, 24):
     dae3c = dae3c + float(sht12.range('C{}'.format(w)).value)
 
 sht1.range('BD14').value = float(1 - (dae1c / dae1b))
