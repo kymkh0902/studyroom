@@ -25,4 +25,3 @@ for epoch_i in range(config.num_epochs):
                   .format(epoch_i, batch_i + 1, len(X_train)//config.batch_size,
                           train_accuracy, test_accuracy))
 
-
