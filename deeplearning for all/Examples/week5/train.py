@@ -17,11 +17,12 @@ sess.run(tf.global_variables_initializer())
 ## for loop을 통해 train 과정하기
 for epoch_i in range(config.num_epochs):
     data_generator = generator(X_train, Y_train, config.batch_size)
+    data_generator2 = generator(X_test, Y_test, config.batch_size)
     for batch_i, (X_batch, Y_batch) in enumerate(data_generator):
         model.train(sess, X_batch, Y_batch)
         if (batch_i + 1) % 100 == 0:
-            test_loss, test_accuracy = model.eval(sess, X_test, Y_test)
-            train_loss, train_accuracy = model.eval(sess, X_train, Y_train)
+            test_loss, test_accuracy = model.eval(sess, X_batch, Y_batch)
+            train_loss, train_accuracy = model.eval(sess, X_batch, Y_batch)
             print('Epoch: {0}, Batch: {1}/{2}, train_accuracy: {3:.3f}, test_accuracy: {4:.3f}'\
                   .format(epoch_i, batch_i + 1, len(X_train)//config.batch_size,
                           train_accuracy, test_accuracy))
