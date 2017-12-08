@@ -11,14 +11,14 @@ class Model(object):
 
     # 입력 데이터를 지정해준다.
     def add_placeholders(self):
-        self.X = tf.placeholder(tf.float32, [None, 784])
-        self.y = tf.placeholder(tf.float32, [None, 10])
+        self.X = tf.placeholder(tf.float32, [None, 784], name='X')
+        self.y = tf.placeholder(tf.float32, [None, 10], name='y')
 
     # 모델을 설계해서 logits를 구하자.
     def build_neural_net(self):
         fc1 = tf.layers.dense(self.X, units=self.num_units, activation=tf.nn.relu)
         self.logits = tf.layers.dense(fc1, units=self.num_classes)
-        self.pred = tf.identity(self.logits, 'prediction')
+        self.pred = tf.argmax(self.logits, axis=1, name='prediction')
 
     # loss를 구하자.
     def build_loss(self):
@@ -32,7 +32,7 @@ class Model(object):
 
     # prediction 값을 구하자.
     def build_accuracy(self):
-        correction = tf.equal(tf.argmax(self.y, axis=1), tf.argmax(self.pred, axis=1))
+        correction = tf.equal(tf.argmax(self.y, axis=1), self.pred)
         self.accuracy = tf.reduce_mean(tf.cast(correction, tf.float32))
 
     # 모델을 build 한다.

@@ -7,3 +7,7 @@ class Config():
         self.num_units = 500
         self.num_classes = 10
         self.data_dir = '../Examples/MNIST_data'
+        self.num_checkpoints = 3
+        self.checkpoint_every = 1
+        self.save_path = '../Examples/MNIST_data/runs/'
+        self.save_filename = 'mnist_model'
