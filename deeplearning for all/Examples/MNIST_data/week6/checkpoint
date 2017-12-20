@@ -1,0 +1,4 @@
+model_checkpoint_path: "mnist_model-2750"
+all_model_checkpoint_paths: "mnist_model-1650"
+all_model_checkpoint_paths: "mnist_model-2200"
+all_model_checkpoint_paths: "mnist_model-2750"
