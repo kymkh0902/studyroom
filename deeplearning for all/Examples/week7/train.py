@@ -1,5 +1,6 @@
 from model import Model
 import numpy as np
+from data_util import load_data, generator, load_RNN_data
 from config import Config
 import tensorflow as tf
 import os
@@ -9,10 +10,9 @@ config = Config()
 ## 모델을 불러오기
 model = Model(config)
 ## 변수 설정하기
-X_data = [config.sample_idx[:-1]]
-Y_data = [config.sample_idx[1:]]
+dataX, dataY, batch_size = load_RNN_data(config.sentence)
 ## session 불러오기
-sess = tf.InteractiveSession()
+sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 
@@ -25,9 +25,9 @@ step = 0
 ## for loop을 통해 train 과정하기
 for epoch_i in range(config.num_epochs):
 
-    loss, accuracy, results = model.eval(sess, X_data, Y_data)
+    for batch_j, result in enumerate(batch_size):
 
-    for batch_j, result in enumerate(results):
+        model.train(sess, dataX, dataY)
 
         index = np.argmax(result, axis=1)
         step += 1
