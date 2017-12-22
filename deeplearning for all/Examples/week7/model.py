@@ -12,6 +12,16 @@
 ## 8. config에 중복된 변수나 이전 과제 변수들은 지울 필요가 있음.
 
 
+##2차 피드백
+
+##1.X_for_softmax, softmax_w, b를 보면 회색임. -> 변수가 쓰이고 있지 않다는 뜻 (이전 코드에서는 쓰였음. 사용하자.)
+##2.batch_size 변수가 어디서 온 건지 명확히 해줘야 할듯, config에 넣는게 좋아보임
+##3.eval에서 accuracy를 사용하지 않으면 굳이 돌리지 않아도 될듯. 사용할 거라면 반환해줘야함.
+##4.data_util에 config를 import 해야 함.
+##중요. pycharm에 회색 변수 or 빨간 밑줄은 문법적인 오류나 사용하지 않은 변수이므로 바로바로 고치는게 좋음.!
+
+##위에 코드 조금만 다듬으면 돌아갈듯요
+
 import tensorflow as tf
 
 class Model(object):
