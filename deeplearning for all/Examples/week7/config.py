@@ -12,6 +12,21 @@ class Config():
         self.num_classes = self.hidden_size
         self.seq_length = 10
         self.learning_rate = 0.1
+
+        self.dataX = []
+        self.dataY = []
+
+        for i in range(0, len(self.sentence) - self.seq_length):
+            x_str = self.sentence[i:i + self.seq_length]
+            y_str = self.sentence[i + 1: i + self.seq_length + 1]
+
+            x = [self.char_dic[c] for c in x_str]
+            y = [self.char_dic[c] for c in y_str]
+
+            self.dataX.append(x)
+            self.dataY.append(y)
+
+        self.batch_size = len(self.dataX)
         self.num_epochs = 500
         self.dropout_rate = 0.3
         self.use_dropout = False

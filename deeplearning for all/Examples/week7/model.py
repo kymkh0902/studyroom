@@ -13,11 +13,6 @@
 
 
 ##2차 피드백
-
-##1.X_for_softmax, softmax_w, b를 보면 회색임. -> 변수가 쓰이고 있지 않다는 뜻 (이전 코드에서는 쓰였음. 사용하자.)
-##2.batch_size 변수가 어디서 온 건지 명확히 해줘야 할듯, config에 넣는게 좋아보임
-##3.eval에서 accuracy를 사용하지 않으면 굳이 돌리지 않아도 될듯. 사용할 거라면 반환해줘야함.
-##4.data_util에 config를 import 해야 함.
 ##중요. pycharm에 회색 변수 or 빨간 밑줄은 문법적인 오류나 사용하지 않은 변수이므로 바로바로 고치는게 좋음.!
 
 ##위에 코드 조금만 다듬으면 돌아갈듯요
@@ -35,6 +30,9 @@ class Model(object):
         self.num_classes = config.num_classes
         self.seq_length = config.seq_length
         self.learning_rate = config.learning_rate
+        self.dataX = config.dataX
+        self.dataY = config.dataY
+        self.batch_size = config.batch_size
         self.num_epochs = config.num_epochs
         self.use_dropout = config.use_dropout
         self.dropout_rate = 0.0
@@ -57,18 +55,19 @@ class Model(object):
         cell = tf.contrib.rnn.BasicLSTMCell(num_units=self.hidden_size, state_is_tuple=True)
         cell = tf.contrib.rnn.MultiRNNCell([cell] * 2, state_is_tuple=True)
 
-        initial_state = cell.zero_state(batch_size, tf.float32)
+        initial_state = cell.zero_state(self.batch_size, tf.float32)
         outputs, _states = tf.nn.dynamic_rnn(
             cell, self.X_one_hot, initial_state = initial_state, dtype = tf.float32)
 
-        outputs = tf.reshape(outputs, [batch_size, self.seq_length, self.num_classes])
+        outputs = tf.reshape(outputs, [self.batch_size, self.seq_length, self.num_classes])
         X_for_softmax = tf.reshape(outputs, [-1, self.hidden_size])
         softmax_w = tf.get_variable("softmax_w", [self.hidden_size, self.num_classes])
         softmax_b = tf.get_variable("softmax_b", [self.num_classes])
 
-        self.outputs = tf.reshape(outputs, [batch_size, self.seq_length, self.num_classes])
+        outputs = tf.matmul(X_for_softmax, softmax_w) + softmax_b
+        self.outputs = tf.reshape(outputs, [self.batch_size, self.seq_length, self.num_classes])
 
-        self.weights = tf.ones([batch_size, self.seq_length])
+        self.weights = tf.ones([self.batch_size, self.seq_length])
 
 
     ## Loss 구하기
@@ -84,7 +83,7 @@ class Model(object):
 
     ## prediction 구하기
     def build_accuracy(self):
-        correction = tf.equal(tf.argmax(self.Y, axis=2), tf.argmax(self.outputs, axis=2))
+        correction = tf.equal(tf.argmax(self.Y, axis=1), tf.argmax(self.outputs, axis=1))
         self.accuracy = tf.reduce_mean(tf.cast(correction, tf.float32))
 
     ## 모델을 build 하기
@@ -115,4 +114,4 @@ class Model(object):
 
         output_feed = [self.loss, self.accuracy, self.outputs]
         loss, accuracy, results = sess.run(output_feed, feed_dict=input_feed)
-        return loss, results
+        return loss, accuracy, results
