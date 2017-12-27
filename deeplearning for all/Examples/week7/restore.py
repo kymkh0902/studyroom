@@ -20,8 +20,8 @@ X = graph.get_tensor_by_name('X:0')
 Y = graph.get_tensor_by_name('Y:0')
 
 ## 데이터를 불러온다.
-X_train, X_test, Y_train, Y_test = load_data(config.data_dir)
-sample_data, sample_label = X_test[: 50], Y_test[: 50]
+_, X_train, X_test, Y_train, Y_test = load_data(config.data_dir)
+sample_data, sample_label = X_test[: 20], Y_test[: 20]
 
 ## 모델을 제대로 불러와서 실행하는지 확인해보자.
 prediction = sess.run(pred, feed_dict={X: sample_data, Y: sample_label})
