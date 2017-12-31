@@ -26,29 +26,31 @@ class Model(object):
 
     ## 모델을 설계하여 logits 구하기
     def build_neural_net(self):
+        cell = tf.contrib.rnn.BasicLSTMCell(self.hidden_size, state_is_tuple=True)
+        multi_cells = tf.contrib.rnn.MultiRNNCell([cell for _ in range(2)],
+                                                  state_is_tuple=True)
 
-        cell = tf.contrib.rnn.BasicLSTMCell(num_units=self.hidden_size, state_is_tuple=True)
-        cell = tf.contrib.rnn.MultiRNNCell([cell] * 2, state_is_tuple=True)
-
-        initial_state = cell.zero_state(self.batch_size, tf.float32)
+        ##initial_state = multi_cells.zero_state(self.batch_size, tf.float32)
         outputs, _states = tf.nn.dynamic_rnn(
-            cell, self.X_one_hot, initial_state = initial_state, dtype = tf.float32)
+            multi_cells, self.X_one_hot, dtype = tf.float32)
 
-        outputs = tf.reshape(outputs, [self.batch_size, self.seq_length, self.num_classes])
-        X_for_softmax = tf.reshape(outputs, [-1, self.hidden_size])
-        softmax_w = tf.get_variable("softmax_w", [self.hidden_size, self.num_classes])
-        softmax_b = tf.get_variable("softmax_b", [self.num_classes])
-
-        outputs = tf.matmul(X_for_softmax, softmax_w) + softmax_b
+        X_for_fc = tf.reshape(outputs, [-1, self.hidden_size])
+        outputs = tf.contrib.layers.fully_connected(X_for_fc, self.num_classes,
+                                                    activation_fn=None)
         self.outputs = tf.reshape(outputs, [self.batch_size, self.seq_length, self.num_classes])
-
         self.weights = tf.ones([self.batch_size, self.seq_length])
+
+        ##X_for_softmax = tf.reshape(outputs, [-1, self.hidden_size])
+        ##softmax_w = tf.get_variable("softmax_w", [self.hidden_size, self.num_classes])
+        ##softmax_b = tf.get_variable("softmax_b", [self.num_classes])
+
+        ##self.outputs = tf.matmul(X_for_softmax, softmax_w) + softmax_b
 
 
     ## Loss 구하기
     def build_loss(self):
-        seq_loss = tf.contrib.seq2seq.sequence_loss(logits=self.outputs,
-                                                         targets=self.Y, weights=self.weights)
+        seq_loss = tf.contrib.seq2seq.sequence_loss(logits=self.outputs, targets=self.Y,
+                                                weights=self.weights)
         self.loss = tf.reduce_mean(seq_loss)
 
     ## train_op 만들기

@@ -33,12 +33,14 @@ for epoch_i in range(config.num_epochs):
             (X_batch_test, Y_batch_test) = next(data_generator2)
             test_loss, test_accuracy, results = model.eval(sess, X_batch_test, Y_batch_test)
             train_loss, train_accuracy, results = model.eval(sess, X_batch_train, Y_batch_train)
-            for j, result in enumerate(results):
-                index = np.argmax(result, axis=1)
-                if j is 0:
-                    print(''.join([char_set[t] for t in index]), end='')
-                else:
-                    print(char_set[index[-1]], end='')
 
+            for epoch_i, j, result in enumerate(results):
+                index = np.argmax(result, axis=1)
+                print(epoch_i, j, ''.join([char_set[t] for t in index]), 1)
+
+                ##if j is 0:
+                ##    print(''.join([char_set[t] for t in index]), end='')
+                ##else:
+                ##    print(char_set[index[-1]], end='')
     if  epoch_i % config.checkpoint_every== 0:
         saver.save(sess, save_path, global_step=step)

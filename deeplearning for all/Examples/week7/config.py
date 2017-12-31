@@ -3,7 +3,7 @@ class Config():
     def __init__(self):
         self.seq_length = 10
         self.learning_rate = 0.1
-        self.batch_size = 20
+        self.batch_size = 170
         self.num_epochs = 500
         self.hidden_size = 27
         self.num_classes = 27

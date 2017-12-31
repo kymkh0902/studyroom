@@ -1,4 +1,2 @@
-model_checkpoint_path: "mnist_model-2772"
-all_model_checkpoint_paths: "mnist_model-2758"
-all_model_checkpoint_paths: "mnist_model-2765"
-all_model_checkpoint_paths: "mnist_model-2772"
+model_checkpoint_path: "mnist_model-0"
+all_model_checkpoint_paths: "mnist_model-0"
